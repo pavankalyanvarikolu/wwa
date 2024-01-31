@@ -1,0 +1,35 @@
+.App {
+  font-family: 'Libra Bodoni', serif;
+  text-align: center;
+}
+
+body {
+  background-image: url("../public/bg.jpg");
+  background-size: cover;
+  height: 100vh;
+}
+
+.booking-heading {
+  margin-top: 5%;
+}
+
+.booking-container {
+  justify-content: center;
+  height: 30vh;
+}
+ 
+.booking-body {
+  margin-top: 20%;
+}
+
+.loading {
+  padding-top: 20%;
+}
+
+.booking-update {
+  height: 40vh;
+}
+
+.wednesday-title {
+  font-size: 70px;
+}
