@@ -1,0 +1,17 @@
+# Ignore all .txt files
+*.txt
+
+# Ignore all .log files, no matter where they're located
+**/*.log
+
+# Ignore any directory named temp
+**/temp
+
+# Ignore single-character .js files (like a.js, b.js, etc.)
+?.js
+
+node_modules
+
+.git
+.gitignore
+

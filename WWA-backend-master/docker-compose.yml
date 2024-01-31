@@ -1,0 +1,31 @@
+version: "3.9"
+
+services:
+  #mongodb
+  mongo_db:
+    container_name: mongo_container
+    image: mongo:latest
+    restart: always
+    ports:
+      - 6000:5000
+    networks:
+      - app-network
+
+  #node backend
+  api:
+    build: .
+    command: npm start
+    ports:
+      - 4000:5000
+    environment:
+      PORT: 5000
+      MONGO_URI: mongodb+srv://shreyashettys202:dg3KtsSYXuSc0t5f@cluster0.idmnhrs.mongodb.net/wwadb?retryWrites=true&w=majority
+      DB_NAME: wwadb
+    depends_on:
+      - mongo_db
+
+networks:
+    app-network:
+        driver: bridge
+
+
