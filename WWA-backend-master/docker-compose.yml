@@ -18,12 +18,13 @@ services:
 
   # Node.js backend service
   backend:
-    image: pavanvarikolu/wwabackend:v1.0
-    container_name: backend-container
+    image: pavanvarikolu/wwabackend:v1.1
+    container_name: wwa_api
+    command: npm start
     depends_on:
       - mongodb
     ports:
-      - 5000:5000
+      - 4000:5000
     environment:
       MONGO_URI: mongodb://${MONGO_ROOT_USER}:${MONGO_ROOT_PASSWORD}@mongodb:27017/${MONGO_DB}
     networks:
@@ -31,8 +32,7 @@ services:
       
   # frontend service
   frontend:
-    build: 
-      context: .wwa\WWA-frontend-master\Dockerfile
+    image: pavanvarikolu/wwafrontend:v1.1
     container_name: frontend-container
     depends_on:
       - backend
