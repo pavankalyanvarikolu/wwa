@@ -1,0 +1,47 @@
+version: "3.9"
+
+services:
+  # MongoDB
+  mongo_db:
+    container_name: mongo_container
+    image: mongo:latest
+    restart: always
+    ports:
+      - 6000:5000
+    networks:
+      - mern-network
+
+  # Node backend
+  api:
+    build: 
+      context: C:\Users\pavan\OneDrive\Documents\ATU\wwa\WWA-backend-master
+      dockerfile: Dockerfile
+    container_name:  wwa_api
+    command: npm start
+    ports:
+      - 4000:5000
+    environment:
+      PORT: 5000
+      MONGO_URI: mongodb+srv://shreyashettys202:dg3KtsSYXuSc0t5f@cluster0.idmnhrs.mongodb.net/wwadb?retryWrites=true&w=majority
+      DB_NAME: wwadb
+    depends_on:
+      - mongo_db
+    networks:
+      - mern-network
+
+  # Frontend
+  frontend:
+    build:
+      context: C:\Users\pavan\OneDrive\Documents\ATU\wwa\WWA-frontend-master
+      dockerfile: Dockerfile
+    container_name: frontend-container
+    depends_on:
+      - api
+    ports:
+      - 3000:3000
+    networks:
+      - mern-network
+
+networks:
+  mern-network:
+    driver: bridge

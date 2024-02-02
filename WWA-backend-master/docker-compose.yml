@@ -31,15 +31,13 @@ services:
       
   # frontend service
   frontend:
-    image: pavanvarikolu/wwafrontend:v1.0
+    build: 
+      context: .wwa\WWA-frontend-master\Dockerfile
     container_name: frontend-container
     depends_on:
       - backend
     ports:
       - 3000:3000
-
-    environment:
-      REACT_APP_API_URL: http://backend:5000
     networks:
       - mern-network
 
