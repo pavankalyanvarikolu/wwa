@@ -1,31 +1,48 @@
-version: "3.9"
+version: '3.8'
 
 services:
-  #mongodb
-  mongo_db:
-    container_name: mongo_container
+  # MongoDB service for the backend
+  mongodb:
     image: mongo:latest
-    restart: always
-    ports:
-      - 6000:5000
-    networks:
-      - app-network
-
-  #node backend
-  api:
-    build: .
-    command: npm start
-    ports:
-      - 4000:5000
+    container_name: mongodb-container
     environment:
-      PORT: 5000
-      MONGO_URI: mongodb+srv://shreyashettys202:dg3KtsSYXuSc0t5f@cluster0.idmnhrs.mongodb.net/wwadb?retryWrites=true&w=majority
-      DB_NAME: wwadb
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_ROOT_USER}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_ROOT_PASSWORD}
+      MONGO_DB: ${MONGO_DB}
+    ports:
+      - 27017:27017
+    volumes:
+      - mongo-data:/data/db  # Volume configuration for MongoDB data
+    networks:
+      - mern-network
+
+  # Node.js backend service
+  backend:
+    image: pavanvarikolu/wwabackend:v1.0
+    container_name: backend-container
     depends_on:
-      - mongo_db
+      - mongodb
+    ports:
+      - 5000:5000
+    environment:
+      MONGO_URI: mongodb://${MONGO_ROOT_USER}:${MONGO_ROOT_PASSWORD}@mongodb:27017/${MONGO_DB}
+    networks:
+      - mern-network
+      
+  # frontend service
+  frontend:
+    image: pavanvarikolu/wwafrontend:v1.0
+    container_name: frontend-container
+    depends_on:
+      - backend
+    ports:
+      - 3000:3000
+    networks:
+      - mern-network
 
 networks:
-    app-network:
-        driver: bridge
+  mern-network:
+    driver: bridge
 
-
+volumes:
+  mongo-data:  # Define a named volume for MongoDB data persistence
