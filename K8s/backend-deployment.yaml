@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backend-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: wwa-api  # Use a valid name, e.g., "wwa-api"
+  template:
+    metadata:
+      labels:
+        app: wwa-api  # Use a valid name, e.g., "wwa-api"
+    spec:
+      containers:
+        - name: wwa-api
+          image: pavanvarikolu/wwabackend:v1.1
+          command: ["npm", "start"]
+          envFrom:
+            - configMapRef:
+                name: mongo-config
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: backend-service
+spec:
+  selector:
+    app: wwa-api  # Use a valid name, e.g., "wwa-api"
+  ports:
+    - protocol: TCP
+      port: 5000
+      targetPort: 5000
