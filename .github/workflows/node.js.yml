@@ -1,0 +1,78 @@
+name: Frontend-Master Workflow
+
+on:
+  push:
+    branches:
+      - "main"
+  pull_request:
+    types:
+      - "opened"
+
+jobs:
+
+  running_backend:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Backend Repository
+        uses: actions/checkout@v4
+        with:
+          repository: "pavankalyanvarikolu/WWA-backend-master" # Replace with the actual repository owner/organization and name
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: "14" # Adjust the Node.js version as needed
+
+      - name: Install Dependencies and Run Tests
+        run: |
+          cd WWA-backend-master
+          npm install
+          npm run test
+
+  building_frontend:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Frontend Repository
+        uses: actions/checkout@v4
+        with:
+          repository: "pavankalyanvarikolu/WWA-frontend-master" # Replace with the actual repository owner/organization and name
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: "14" # Adjust the Node.js version as needed
+
+      - name: Install Dependencies and Build
+        run: |
+          cd WWA-frontend-master
+          npm install
+          npm run build
+
+  automated_document:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Build JSDoc
+        uses: andstor/jsdoc-action@v1
+
+      - name: Generate Documentation
+        run: |
+          cd WWA-frontend-master
+          npm install -g jsdoc
+          npm install
+          npm run docs
+
+  running_docker:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Pull Docker Image
+        run: docker pull pavanvarikolu/wwafrontend:v1.0
+
+      - name: Build Docker Container
+        run: docker run --name wwafrontendapp -p 3000:3000 -d pavanvarikolu/wwafrontend:v1.0
