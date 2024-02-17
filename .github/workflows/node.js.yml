@@ -1,78 +1,46 @@
-name: Frontend-Master Workflow
+name: MERN Stack CI/CD
 
 on:
   push:
     branches:
-      - "backend"
-  pull_request:
-    types:
-      - "opened"
+      - main
+      - backend
+      - frontend
 
 jobs:
-
-  running_backend:
+  build:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout Backend Repository
-        uses: actions/checkout@v4
-        with:
-          repository: "pavankalyanvarikolu/WWA-backend-master" # Replace with the actual repository owner/organization and name
+      - name: Checkout code
+        uses: actions/checkout@v2
 
-      - name: Setup Node.js
+      - name: Install Node.js
         uses: actions/setup-node@v2
         with:
-          node-version: "20" # Adjust the Node.js version as needed
+          node-version: '14'
 
-      - name: Install Dependencies and Run Tests
-        run: |
-          cd WWA-backend-master
-          npm install
-          npm run test
+      - name: Install backend dependencies
+        if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/backend'
+        working-directory: backend
+        run: npm install
 
-  building_frontend:
-    runs-on: ubuntu-latest
+      - name: Run backend tests
+        if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/backend'
+        working-directory: backend
+        run: npm test
 
-    steps:
-      - name: Checkout Frontend Repository
-        uses: actions/checkout@v4
-        with:
-          repository: "pavankalyanvarikolu/WWA-frontend-master" # Replace with the actual repository owner/organization and name
+      - name: Install frontend dependencies
+        if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/frontend'
+        working-directory: frontend
+        run: npm install
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v2
-        with:
-          node-version: "14" # Adjust the Node.js version as needed
+      - name: Run frontend tests
+        if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/frontend'
+        working-directory: frontend
+        run: npm test
 
-      - name: Install Dependencies and Build
-        run: |
-          cd WWA-frontend-master
-          npm install
-          npm run build
-
-  automated_document:
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v4
-
-      - name: Build JSDoc
-        uses: andstor/jsdoc-action@v1
-
-      - name: Generate Documentation
-        run: |
-          cd WWA-frontend-master
-          npm install -g jsdoc
-          npm install
-          npm run docs
-
-  running_docker:
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Pull Docker Image
-        run: docker pull pavanvarikolu/wwafrontend:v1.0
-
-      - name: Build Docker Container
-        run: docker run --name wwafrontendapp -p 3000:3000 -d pavanvarikolu/wwafrontend:v1.0
+      - name: Build frontend
+        if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/frontend'
+        working-directory: frontend
+        run: npm run build
