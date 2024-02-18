@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: wwa-api
-          image: pavanvarikolu/wwabackend:v1.1
+          image: pavanvarikolu/wwabackend:v1.1.1
           command: ["npm", "start"]
           envFrom:
             - configMapRef:
