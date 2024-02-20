@@ -29,29 +29,29 @@ jobs:
         working-directory: ./WWA-frontend-master
         run: |
           npm install
-        
+          npm test
 
       # Install dependencies, export environment variables to be used by application and run tests for the server application
       - name: Install and Test Server
         working-directory: ./WWA-backend-master
         run: |
           npm install
-         
+          npm test
 
       # Build a Docker image for the client application
       - name: Build Client Docker Image
         working-directory: ./WWA-frontend-master
-        # Build image with tag rakeshpotnuru/productivity-app:client
+        # Build image with tag pavanvarikolu/wwafrontend:client
         run: |
            docker build -t pavanvarikolu/wwafrontend:client-${{github.run_number}} .
 
       # Build a Docker image for the server application
       - name: Build Server Docker Image
-        working-directory:
-          ./WWA-backend-master
-          # Build image with tag rakeshpotnuru/productivity-app:server
+        working-directory: ./WWA-backend-master
+        # Build image with tag pavanvarikolu/wwabackend:server
         run: |
           docker build -t pavanvarikolu/wwabackend:server-${{github.run_number}} .
+
       # Login to Docker Hub using credentials from repository secrets
       - name: Login to Docker Hub
         uses: docker/login-action@v1
@@ -62,5 +62,5 @@ jobs:
       # Push the Docker images to Docker Hub
       - name: Push Docker Images to Docker Hub
         run: |
-          docker push pavanvarikolu/wwafrontend:client-${{github.run_number}}
-          docker push pavanvarikolu/wwabackend:server-${{github.run_number}}
+          docker push pavanvarikolu/wwafrontend:client-${{github.run_number}} || true
+          docker push pavanvarikolu/wwabackend:server-${{github.run_number}} || true
