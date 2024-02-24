@@ -1,65 +1,59 @@
-# The name of the workflow.
 name: Build and Deploy
 
-# Run the workflow when code is pushed to the main branch
 on:
   push:
     branches:
       - main
 
-# Set environment variables
 env:
   MONGODB_URI: ${{ secrets.MONGODB_URI }}
   TOKEN_KEY: ${{ secrets.TOKEN_KEY }}
   EMAIL: ${{ secrets.EMAIL }}
   PASSWORD: ${{ secrets.PASSWORD }}
 
-# This is the workflow that is being run.
 jobs:
   build-and-deploy:
-    # This is telling GitHub to run the workflow on the latest version of Ubuntu.
     runs-on: ubuntu-latest
     steps:
-      # Checkout the code from the GitHub repository
       - name: Checkout code
         uses: actions/checkout@v2
 
-      # Install dependencies and run tests for the client application
-      - name: Install forntend
+      - name: Install frontend dependencies
         working-directory: ./WWA-frontend-master
-        run: |
-          npm install
-         
+        run: npm install
 
-      # Install dependencies, export environment variables to be used by application and run tests for the server application
-      - name: Install backend
+      - name: Install backend dependencies
         working-directory: ./WWA-backend-master
-        run: |
-          npm install
-         
+        run: npm install
 
-      # Build a Docker image for the client application
       - name: Build Client Docker Image
         working-directory: ./WWA-frontend-master
-        # Build image with tag pavanvarikolu/wwafrontend:client
-        run: |
-           docker build -t pavanvarikolu/wwafrontend:client-${{github.run_number}} .
+        run: docker build -t pavanvarikolu/wwafrontend:client-${{github.run_number}} .
 
-      # Build a Docker image for the server application
       - name: Build Server Docker Image
         working-directory: ./WWA-backend-master
-        # Build image with tag pavanvarikolu/wwabackend:server
-        run: |
-          docker build -t pavanvarikolu/wwabackend:server-${{github.run_number}} .
+        run: docker build -t pavanvarikolu/wwabackend:server-${{github.run_number}} .
 
-      # Login to Docker Hub using credentials from repository secrets
+      - name: OWASP Dependency-Check for frontend
+        working-directory: ./WWA-frontend-master
+        uses: owasp/dependency-check-action@v2
+
+      - name: OWASP Dependency-Check for backend
+        working-directory: ./WWA-backend-master
+        uses: owasp/dependency-check-action@v2
+
+      - name: Trivy Scan Client Docker Image
+        run: docker run --rm -v $(pwd)/WWA-frontend-master:/src -v /var/run/docker.sock:/var/run/docker.sock aquasec/trivy pavanvarikolu/wwafrontend:client-${{github.run_number}}
+
+      - name: Trivy Scan Server Docker Image
+        run: docker run --rm -v $(pwd)/WWA-backend-master:/src -v /var/run/docker.sock:/var/run/docker.sock aquasec/trivy pavanvarikolu/wwabackend:server-${{github.run_number}}
+
       - name: Login to Docker Hub
         uses: docker/login-action@v1
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
-      # Push the Docker images to Docker Hub
       - name: Push Docker Images to Docker Hub
         run: |
           docker push pavanvarikolu/wwafrontend:client-${{github.run_number}} || true
