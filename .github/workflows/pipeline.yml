@@ -53,10 +53,12 @@ jobs:
           docker build -t pavanvarikolu/wwabackend:server-${{github.run_number}} .
 
       - name: Trivy Scan Client Docker Image
-        run: docker run --rm -v ${{ github.workspace }}/WWA-frontend-master:/src -v /var/run/docker.sock:/var/run/docker.sock aquasec/trivy pavanvarikolu/wwafrontend:client-${{github.run_number}}
+        run: |
+          docker run --rm -v ${PWD}/WWA-frontend-master:/src -v /var/run/docker.sock:/var/run/docker.sock aquasec/trivy pavanvarikolu/wwafrontend:client-${{github.run_number}}
 
       - name: Trivy Scan Server Docker Image
-        run: docker run --rm -v ${{ github.workspace }}/WWA-backend-master:/src -v /var/run/docker.sock:/var/run/docker.sock aquasec/trivy pavanvarikolu/wwabackend:server-${{github.run_number}}
+        run: |
+          docker run --rm -v ${PWD}/WWA-backend-master:/src -v /var/run/docker.sock:/var/run/docker.sock aquasec/trivy pavanvarikolu/wwabackend:server-${{github.run_number}}
 
       # Login to Docker Hub using credentials from repository secrets
       - name: Login to Docker Hub
