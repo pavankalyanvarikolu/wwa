@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: mongo-config
+data:
+  MONGO_ROOT_USER: "shreyashettys202"
+  MONGO_ROOT_PASSWORD: "dg3KtsSYXuSc0t5f"
+  MONGO_DB: "wwadb"
