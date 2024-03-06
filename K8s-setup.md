@@ -1,0 +1,96 @@
+--- KUBERNETES ---
+
+# Step1:
+
+#On Master and Worker 
+
+sudo apt-get update -y
+sudo apt-get install docker.io -y
+service docker restart 
+sudo mkdir -m 755 /etc/apt/keyrings
+sudo apt-get update
+sudo apt-get install -y apt-transport-https ca-certificates curl gpg
+curl -fsSL https://pkgs.k8s.io/core:/stable:/v1.28/deb/Release.key | sudo gpg --dearmor -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg
+echo 'deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v1.28/deb/ /' | sudo tee /etc/apt/sources.list.d/kubernetes.list
+sudo apt-get update
+sudo apt-get install -y kubelet kubeadm kubectl
+sudo apt-mark hold kubelet kubeadm kubectl
+
+# Disable Swap and Set Hostname (On all nodes)
+# Disable Swap
+sudo swapoff -a
+sudo sed -i '/ swap / s/^\(.*\)$/#\1/g' /etc/fstab
+
+# Set Hostname
+sudo hostnamectl set-hostname <node-name>
+
+# Step2:
+
+#On Master node:
+
+   kubeadm init --pod-network-cidr=192.168.0.0/16
+   
+After the command completes, it will output a kubeadm join command. Save this command as you will use it later to join worker nodes.
+  
+   
+# Step3: 
+
+# On Master node: 
+
+mkdir -p $HOME/.kube
+sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
+sudo chown $(id -u):$(id -g) $HOME/.kube/config
+
+
+   
+# step4:
+
+#On Master node:
+
+kubectl apply -f https://raw.githubusercontent.com/projectcalico/calico/v3.25.1/manifests/calico.yaml 
+kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v0.49.0/deploy/static/provider/baremetal/deploy.yaml
+
+# Step 5: Verify the Cluster (On the Master Node)
+kubectl get nodes
+kubectl get pods --all-namespaces
+
+# step6 Deploy a sample ndinx app 
+nginx-deployment.yml
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-deployment
+  labels:
+    app: nginx
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: nginx
+  template:
+    metadata:
+      labels:
+        app: nginx
+    spec:
+      containers:
+      - name: nginx
+        image: nginx:1.14.2
+        ports:
+        - containerPort: 80       
+               
+			   
+nginx-service.yml
+apiVersion: v1
+kind: Service
+metadata:
+  name: nginx-service
+spec:
+  type: NodePort
+  selector:
+    app: nginx
+  ports:
+    - port: 80
+      nodePort: 30080
+	  
+Note: make sure to open necessary ports in Security group

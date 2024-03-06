@@ -1,0 +1,37 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: todo-client-app-deploy
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: todo-client-app
+  template:
+    metadata:
+      labels:
+        app: todo-client-app
+    spec:
+      containers:
+      - image: naynnpn/wwa-frontend-image:v1.5
+        name: container1
+        ports:
+          - containerPort: 3000
+        imagePullPolicy: IfNotPresent
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: todo-client-service
+  labels:
+    app: todo-client-app
+spec:
+  selector:
+    app: todo-client-app
+  ports:
+  - port: 3000
+    targetPort: 3000
+  type: LoadBalancer
+  
+  
+    
