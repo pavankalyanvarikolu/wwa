@@ -43,14 +43,14 @@ jobs:
         working-directory: ./WWA-frontend-master
         # Build image with tag pavanvarikolu/wwafrontend:client
         run: |
-           docker build -t pavanvarikolu/wwafrontend-client:latest
+           docker build -t pavanvarikolu/wwafrontend-client:latest .
 
       # Build a Docker image for the server application
       - name: Build Server Docker Image
         working-directory: ./WWA-backend-master
         # Build image with tag pavanvarikolu/wwabackend:server
         run: |
-          docker build -t pavanvarikolu/wwabackend-server:latest
+          docker build -t pavanvarikolu/wwabackend-server:latest .
 
      # - name: Trivy Scan Client Docker Image
       #  run: |
