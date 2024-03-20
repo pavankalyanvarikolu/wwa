@@ -64,3 +64,52 @@ jobs:
         run: |
           docker push pavanvarikolu/wwafrontend:client-${{github.run_number}} || true
           docker push pavanvarikolu/wwabackend:server-${{github.run_number}} || true
+
+  IAC_Build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout codes
+        uses: actions/checkout@v4
+
+      - name: Configure AWS
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{secrets.AWS_ACCESSKEY}}
+          aws-secret-access-key: ${{secrets.AWS_SECRETEKEY}}
+          aws-region: ${{secrets.AWS_REGION}}
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+         terraform_version: "1.1.7"
+
+      - name: Run Terraform Commands
+        run: |
+         cd wwa/terraform
+         terraform init
+         terraform validate -no-color
+         terraform plan 
+         terraform apply -auto-approve
+
+      - name: Capture EC2 Public IP
+        id: ec2_public_ip
+        run: |
+         cd wwa/terraform
+         EC2_PUBLIC_IP=$(terraform output ec2_public_ip)
+         echo "::set-output name=ec2_public_ip::$EC2_PUBLIC_IP"
+
+  OWASP-ZAP_scan:
+    runs-on: ubuntu-latest
+    name: OWASP-ZAP_scaning
+    permissions: write-all
+    needs: [ build-and-deploy, IAC_Build ]
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Get Terraform Output
+        id: terraform_output
+        run: |
+         cd wwa/terraform
+         TARGET_URL=$(terraform output ec2_public_ip)
+         echo "::set-output name=target::$TARGET_URL"
