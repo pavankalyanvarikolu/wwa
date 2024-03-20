@@ -25,7 +25,7 @@ jobs:
         uses: actions/checkout@v2
 
       # Install dependencies and run tests for the client application
-      - name: Install forntend
+      - name: Install frontend
         working-directory: ./WWA-frontend-master
         run: |
           npm install
@@ -52,12 +52,6 @@ jobs:
         run: |
           docker build -t pavanvarikolu/wwabackend-server:latest .
 
-     # - name: Trivy Scan Client Docker Image
-      #  run: |
-      #    docker run --rm -v ${PWD}/WWA-frontend-master:/src -v /var/run/docker.sock:/var/run/docker.sock aquasec/trivy pavanvarikolu/wwafrontend-client:v1.1.1
-     # - name: Trivy Scan Server Docker Image
-     #   run: |
-      #    docker run --rm -v ${PWD}/WWA-backend-master:/src -v /var/run/docker.sock:/var/run/docker.sock aquasec/trivy pavanvarikolu/wwabackend-server:v1.1.1
       # Login to Docker Hub using credentials from repository secrets
       - name: Login to Docker Hub
         uses: docker/login-action@v1
@@ -70,3 +64,52 @@ jobs:
         run: |
           docker push pavanvarikolu/wwafrontend:client-${{github.run_number}} || true
           docker push pavanvarikolu/wwabackend:server-${{github.run_number}} || true
+
+  IAC_Build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout codes
+        uses: actions/checkout@v4
+
+      - name: Configure AWS
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{secrets.AWS_ACCESSKEY}}
+          aws-secret-access-key: ${{secrets.AWS_SECRETEKEY}}
+          aws-region: ${{secrets.AWS_REGION}}
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+         terraform_version: "1.1.7"
+
+      - name: Run Terraform Commands
+        run: |
+         cd wwa/terraform
+         terraform init
+         terraform validate -no-color
+         terraform plan 
+         terraform apply -auto-approve
+
+      - name: Capture EC2 Public IP
+        id: ec2_public_ip
+        run: |
+         cd DevOps2023-2024-Group3/terraform
+         EC2_PUBLIC_IP=$(terraform output ec2_public_ip)
+         echo "::set-output name=ec2_public_ip::$EC2_PUBLIC_IP"
+
+  OWASP-ZAP_scan:
+    runs-on: ubuntu-latest
+    name: OWASP-ZAP_scaning
+    permissions: write-all
+    needs: [ build-and-deploy, IAC_Build ]
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Get Terraform Output
+        id: terraform_output
+        run: |
+         cd wwa/terraform
+         TARGET_URL=$(terraform output ec2_public_ip)
+         echo "::set-output name=target::$TARGET_URL"
