@@ -14,10 +14,22 @@ spec:
     spec:
       containers:
         - name: mongodb
-          image: mongo:latest
-          envFrom:
-            - configMapRef:
-                name: "mongo-config"
+          image: mongo:4.4 # Specify a version rather than using 'latest'
+          ports:
+            - containerPort: 27017
+          resources:
+            requests:
+              memory: "256Mi" # Define resource requests
+              cpu: "0.1"
+            limits:
+              memory: "1Gi" # Define resource limits
+              cpu: "0.5"
+          volumeMounts:
+            - name: mongodb-storage
+              mountPath: /data/db # Mount path for MongoDB data
+      volumes:
+        - name: mongodb-storage
+          emptyDir: {} # Use emptyDir for demonstration; replace with persistent volume for production
 ---
 apiVersion: v1
 kind: Service
