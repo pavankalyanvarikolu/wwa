@@ -60,7 +60,7 @@ jobs:
         working-directory: ./WWA-frontend-master
         # Build image with tag pavanvarikolu/wwafrontend-client:latest
         run: |
-          docker build -t pavanvarikolu/wwafrontend-client:latest .
+           docker build -t pavanvarikolu/wwafrontend-client:latest .
 
       # Build a Docker image for the server application
       - name: Build Server Docker Image
@@ -91,39 +91,40 @@ jobs:
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
         with:
-          terraform_version: "1.1.7"
+         terraform_version: "1.1.7"
 
       - name: Running Terraform Commands
         working-directory: ./terraform
         run: |
-          terraform init
-          terraform validate -no-color
-          terraform plan 
-          terraform apply -auto-approve | tee terraform_output.txt 
+         terraform init
+         terraform validate -no-color
+         terraform plan 
+         terraform apply -auto-approve | tee terraform_output.txt 
 
       - name: Get Terraform Output
         id: terraform_output
         run: |
-          cd wwa/terraform
-          TARGET_URL=$(terraform output ec2_public_ip)
-          echo "::set-output name=target::$TARGET_URL"
+         cd ./terraform
+         TARGET_URL=$(terraform output ec2_public_ip)
+         echo "::set-output name=target::$TARGET_URL"
 
+  
   OWASP-ZAP_scan:
     runs-on: ubuntu-latest
     name: OWASP-ZAP_scaning
     permissions: write-all
-    needs: [build-test-and-deploy, iac-build-and-deploy]
+    #needs: [ Build_docker_FrontendImage, IAC_Build]
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
-      
+
       - name: Get Terraform Output
         id: terraform_output
         run: |
-          cd wwa/terraform
-          TARGET_URL=$(terraform output ec2_public_ip)
-          echo "::set-output name=target::$TARGET_URL"
-      
+         cd ./terraform
+         TARGET_URL=$(terraform output ec2_public_ip)
+         echo "::set-output name=target::$TARGET_URL"
+
       - name: ZAP Scan
         id: zap_scan
         uses: zaproxy/action-baseline@v0.11.0
@@ -132,7 +133,7 @@ jobs:
           target: ${{ steps.terraform_output.outputs.target }}
           rules_file_name: '.zap/rules.tsv'
           cmd_options: '-a'
-      
+
       - name: Upload ZAP Scan Report
         if: ${{ failure() }}
         uses: actions/upload-artifact@v2
@@ -141,9 +142,10 @@ jobs:
           path: |
             report_html.html
             report_json.json
-      
+
       - name: Destroy Terraform Resources
         if: ${{ failure() }}
         run: |
-          cd wwa/terraform
-          terraform destroy -auto-approve
+         cd ./terraform
+         terraform destroy -auto-approve
+         
