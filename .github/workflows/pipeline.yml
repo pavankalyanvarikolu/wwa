@@ -95,7 +95,7 @@ jobs:
 
       - name: runnning Terraform Commands
         run: |
-         cd /home/runner/work/wwa/terraform
+         ./terraform
          terraform init
          terraform validate -no-color
          terraform plan 
