@@ -94,7 +94,7 @@ jobs:
 
       - name: Running Terraform Commands
         run: |
-         cd wwa/terraform/
+         cd ./WWA-terraform
          terraform init
          terraform validate -no-color
          terraform plan 
