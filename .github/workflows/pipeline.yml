@@ -53,7 +53,7 @@ jobs:
       - name: Deleteing old docker images
         run: |
           docker rmi -f $(docker image ls -a -q)
-          
+
       # Build a Docker image for the client application
       - name: Build Client Docker Image
         working-directory: ./WWA-frontend-master
@@ -75,5 +75,32 @@ jobs:
         run: |
           docker push pavanvarikolu/wwafrontend:client-${{github.run_number}} || true
           docker push pavanvarikolu/wwabackend:server-${{github.run_number}} || true
+  IAC_Build:
+    runs-on: ubuntu-latest
+    permissions: write-all
+    steps:
+      - name: Checkout codess
+        uses: actions/checkout@v4
+      - name: Configure AWS
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{secrets.AWS_ACCESSKEY}}
+          aws-secret-access-key: ${{secrets.AWS_SECRETEKEY}}
+          aws-region: ${{secrets.AWS_REGION}}
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+         terraform_version: "1.1.7"
+
+      - name: runnning Terraform Commands
+        run: |
+         cd /home/runner/work/DevOps2023-2024-Group3/DevOps2023-2024-Group3/terraform
+         terraform init
+         terraform validate -no-color
+         terraform plan 
+         terraform apply -auto-approve | tee terraform_output.txt 
+         
+      
 
   
