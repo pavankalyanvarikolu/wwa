@@ -95,7 +95,7 @@ jobs:
 
       - name: runnning Terraform Commands
         run: |
-         cd /home/runner/work/DevOps2023-2024-Group3/DevOps2023-2024-Group3/terraform
+         cd /home/runner/work/wwa/terraform
          terraform init
          terraform validate -no-color
          terraform plan 
