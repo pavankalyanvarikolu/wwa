@@ -93,8 +93,8 @@ jobs:
          terraform_version: "1.1.7"
 
       - name: Running Terraform Commands
+        working-directory: ./WWA-terraform
         run: |
-         cd ./WWA-terraform
          terraform init
          terraform validate -no-color
          terraform plan 
