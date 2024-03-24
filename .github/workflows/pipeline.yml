@@ -50,36 +50,35 @@ jobs:
         run: echo Docker login process failed.
 
       # removing old docker images
-      - name: Deleteing old docker images
+      - name: Deleting old docker images
         run: |
           docker rmi -f $(docker image ls -a -q)
 
       # Build a Docker image for the client application
       - name: Build Client Docker Image
         working-directory: ./WWA-frontend-master
-        # Build image with tag pavanvarikolu/wwafrontend:client
+        # Build image with tag pavanvarikolu/wwafrontend-client:latest
         run: |
            docker build -t pavanvarikolu/wwafrontend-client:latest .
 
       # Build a Docker image for the server application
       - name: Build Server Docker Image
         working-directory: ./WWA-backend-master
-        # Build image with tag pavanvarikolu/wwabackend:server
+        # Build image with tag pavanvarikolu/wwabackend-server:latest
         run: |
           docker build -t pavanvarikolu/wwabackend-server:latest .
-
-      
 
       # Push the Docker images to Docker Hub
       - name: Push Docker Images to Docker Hub
         run: |
-          docker push pavanvarikolu/wwafrontend:client-${{github.run_number}} || true
-          docker push pavanvarikolu/wwabackend:server-${{github.run_number}} || true
+          docker push pavanvarikolu/wwafrontend-client:latest || true
+          docker push pavanvarikolu/wwabackend-server:latest || true
+
   IAC_Build:
     runs-on: ubuntu-latest
     permissions: write-all
     steps:
-      - name: Checkout codess
+      - name: Checkout codes
         uses: actions/checkout@v4
       - name: Configure AWS
         uses: aws-actions/configure-aws-credentials@v4
@@ -93,14 +92,10 @@ jobs:
         with:
          terraform_version: "1.1.7"
 
-      - name: runnning Terraform Commands
+      - name: Running Terraform Commands
         run: |
-         ./terraform
+         cd WWA-terraform
          terraform init
          terraform validate -no-color
          terraform plan 
          terraform apply -auto-approve | tee terraform_output.txt 
-         
-      
-
-  
