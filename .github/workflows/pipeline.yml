@@ -96,10 +96,11 @@ jobs:
       - name: Running Terraform Commands
         working-directory: ./terraform
         run: |
-     #    terraform init
-     #    terraform validate -no-color
-     #    terraform plan 
-      #   terraform apply -auto-approve | tee terraform_output.txt 
+         terraform init
+         terraform validate -no-color
+         terraform plan 
+         terraform apply -auto-approve | tee terraform_output.txt 
+         terraform destroy -auto-approve
 
       - name: Get Terraform Output
         id: terraform_output
