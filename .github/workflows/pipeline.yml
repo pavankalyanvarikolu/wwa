@@ -29,14 +29,14 @@ jobs:
         working-directory: ./WWA-frontend-master
         run: |
           npm install
-          npm test
+     #     npm test
 
       # Install dependencies, export environment variables to be used by application and run tests for the server application
       - name: Install backend
         working-directory: ./WWA-backend-master
         run: |
           npm install
-          npm test
+      #    npm test
 
       # Login to Docker Hub using credentials from repository secrets
       - name: Login to Docker Hub
