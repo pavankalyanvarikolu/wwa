@@ -51,18 +51,9 @@ echo "Press 'q' to exit status view"
 sudo systemctl status prometheus | less
 
 # Clone the repository containing Kubernetes files
-sudo git clone https://github.com/pavankalyanvarikolu/wwa.git /home/ubuntu/wwa
+sudo git clone https://github.com/pavankalyanvarikolu/wwa.git
 
-# Navigate to the cloned repository directory
-cd /home/ubuntu/wwa
-# Change the ownership of the directory to the current user
-sudo chown -R $USER:$USER .
-
-# Switch to the 'main' branch
-git checkout main
-
-# Navigate to the directory containing Kubernetes files
-cd K8latest
+cd wwa/k8latest/
 
 # Apply Kubernetes configurations
 sudo kubectl apply -f .
