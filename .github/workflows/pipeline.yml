@@ -100,7 +100,7 @@ jobs:
          terraform validate -no-color
          terraform plan 
          terraform apply -auto-approve | tee terraform_output.txt 
-         TARGET_URL=$(terraform output -json ec2_public_ip | jq -r '.value')
+         TARGET_URL=$(terraform output ec2_public_ip)
          echo "::set-output name=target::$TARGET_URL"
          echo "EC2 IP Address: $TARGET_URL"  # Print EC2 IP in the pipeline
          echo "##[group]Terraform Output"
