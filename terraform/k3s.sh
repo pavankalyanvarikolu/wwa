@@ -46,6 +46,10 @@ sudo systemctl daemon-reload
 sudo systemctl start node_exporter
 sudo systemctl status node_exporter
 
+# Exiting after viewing status
+echo "Press 'q' to exit status view"
+sudo systemctl status prometheus | less
+
 # Clone the repository containing Kubernetes files
 sudo git clone https://github.com/pavankalyanvarikolu/wwa.git /home/ubuntu/wwa
 
@@ -54,11 +58,11 @@ cd /home/ubuntu/wwa
 # Change the ownership of the directory to the current user
 sudo chown -R $USER:$USER .
 
-# Switch to the 'develop' branch
-git checkout develop
+# Switch to the 'main' branch
+git checkout main
 
 # Navigate to the directory containing Kubernetes files
-cd K8s
+cd K8latest
 
 # Apply Kubernetes configurations
 sudo kubectl apply -f .
