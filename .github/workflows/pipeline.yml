@@ -29,13 +29,6 @@ jobs:
         working-directory: ./WWA-frontend-master
         run: |
           npm install
-<<<<<<< HEAD
-<<<<<<< HEAD
-      #    npm test
-=======
->>>>>>> 58b162c831faea0bb5abeb45fde6f76fbbcac35f
-=======
->>>>>>> 58b162c831faea0bb5abeb45fde6f76fbbcac35f
 
       # Install dependencies, export environment variables to be used by application and run tests for the server application
       - name: Install backend
@@ -105,35 +98,16 @@ jobs:
         id: running-terraform-commands
         working-directory: ./terraform
         run: |
-<<<<<<< HEAD
-<<<<<<< HEAD
-         terraform init
-         terraform validate -no-color
-         terraform plan 
-         terraform apply -auto-approve | tee terraform_output.txt 
-         TARGET_URL=$(terraform output ec2_public_ip)
-         echo "::set-output name=target::$TARGET_URL"
-         echo "EC2 IP Address: $TARGET_URL"  # Print EC2 IP in the pipeline
-         echo "##[group]Terraform Output"
-         cat terraform_output.txt
-         echo "##[endgroup]"
-         terraform destroy -auto-approve  # Destroy resources after printing IP
-      
-    
-         
-=======
-=======
->>>>>>> 58b162c831faea0bb5abeb45fde6f76fbbcac35f
-          terraform init
-          terraform validate -no-color
-          terraform plan 
-          terraform apply -auto-approve | tee terraform_output.txt 
-          TARGET_URL=$(terraform output ec2_public_ip)
-          echo "::set-output name=target::$TARGET_URL"
-          echo "EC2 IP Address: $TARGET_URL"  # Print EC2 IP in the pipeline
-          echo "##[group]Terraform Output"
-          cat terraform_output.txt
-          echo "##[endgroup]"
+       #   terraform init
+       #   terraform validate -no-color
+       #   terraform plan 
+       #   terraform apply -auto-approve | tee terraform_output.txt 
+       #   TARGET_URL=$(terraform output ec2_public_ip)
+       #   echo "::set-output name=target::$TARGET_URL"
+       #   echo "EC2 IP Address: $TARGET_URL"  # Print EC2 IP in the pipeline
+       #   echo "##[group]Terraform Output"
+       #   cat terraform_output.txt
+       #   echo "##[endgroup]"
        #   terraform destroy -auto-approve  # Destroy resources after printing IP
 
   zap_scan:
@@ -161,7 +135,3 @@ jobs:
           path: |
             report_html.html
             report_json.json
-<<<<<<< HEAD
->>>>>>> 58b162c831faea0bb5abeb45fde6f76fbbcac35f
-=======
->>>>>>> 58b162c831faea0bb5abeb45fde6f76fbbcac35f
