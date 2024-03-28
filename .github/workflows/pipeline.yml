@@ -1,5 +1,5 @@
 # The name of the workflow.
-name: Build and Deploy
+name: Build, Test, and Deploy
 
 # Run the workflow when code is pushed to the main branch
 on:
@@ -16,7 +16,7 @@ env:
 
 # This is the workflow that is being run.
 jobs:
-  build-and-deploy:
+  build-test-and-deploy:
     # This is telling GitHub to run the workflow on the latest version of Ubuntu.
     runs-on: ubuntu-latest
     steps:
@@ -29,14 +29,17 @@ jobs:
         working-directory: ./WWA-frontend-master
         run: |
           npm install
-         
+<<<<<<< HEAD
+      #    npm test
+=======
+>>>>>>> 58b162c831faea0bb5abeb45fde6f76fbbcac35f
 
       # Install dependencies, export environment variables to be used by application and run tests for the server application
       - name: Install backend
         working-directory: ./WWA-backend-master
         run: |
           npm install
-         
+
       # Login to Docker Hub using credentials from repository secrets
       - name: Login to Docker Hub
         uses: docker/login-action@v1
@@ -45,7 +48,7 @@ jobs:
           password: ${{ secrets.DOCKER_PASSWORD }}
 
       # checking docker login status
-      - name:  Check docker login status
+      - name: Check docker login status
         if: failure()
         run: echo Docker login process failed.
 
@@ -59,7 +62,7 @@ jobs:
         working-directory: ./WWA-frontend-master
         # Build image with tag pavanvarikolu/wwafrontend-client:latest
         run: |
-           docker build -t pavanvarikolu/wwafrontend-client:latest .
+          docker build -t pavanvarikolu/wwafrontend-client:latest .
 
       # Build a Docker image for the server application
       - name: Build Server Docker Image
@@ -74,9 +77,12 @@ jobs:
           docker push pavanvarikolu/wwafrontend-client:latest || true
           docker push pavanvarikolu/wwabackend-server:latest || true
 
-  IAC_Build:
+  iac-build-and-deploy:
     runs-on: ubuntu-latest
     permissions: write-all
+    needs: build-test-and-deploy
+    outputs:
+      target_url: ${{ steps.running-terraform-commands.outputs.target }}
     steps:
       - name: Checkout codes
         uses: actions/checkout@v4
@@ -90,12 +96,63 @@ jobs:
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
         with:
-         terraform_version: "1.1.7"
+          terraform_version: "1.1.7"
 
       - name: Running Terraform Commands
+        id: running-terraform-commands
         working-directory: ./terraform
         run: |
+<<<<<<< HEAD
          terraform init
          terraform validate -no-color
          terraform plan 
          terraform apply -auto-approve | tee terraform_output.txt 
+         TARGET_URL=$(terraform output ec2_public_ip)
+         echo "::set-output name=target::$TARGET_URL"
+         echo "EC2 IP Address: $TARGET_URL"  # Print EC2 IP in the pipeline
+         echo "##[group]Terraform Output"
+         cat terraform_output.txt
+         echo "##[endgroup]"
+         terraform destroy -auto-approve  # Destroy resources after printing IP
+      
+    
+         
+=======
+          terraform init
+          terraform validate -no-color
+          terraform plan 
+          terraform apply -auto-approve | tee terraform_output.txt 
+          TARGET_URL=$(terraform output ec2_public_ip)
+          echo "::set-output name=target::$TARGET_URL"
+          echo "EC2 IP Address: $TARGET_URL"  # Print EC2 IP in the pipeline
+          echo "##[group]Terraform Output"
+          cat terraform_output.txt
+          echo "##[endgroup]"
+       #   terraform destroy -auto-approve  # Destroy resources after printing IP
+
+  zap_scan:
+    name: OWASP-ZAP integration 
+    runs-on: ubuntu-latest
+    permissions: write-all
+    needs: iac-build-and-deploy
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+        with:
+          ref: main
+      - name: ZAP Scan
+        uses: zaproxy/action-baseline@v0.11.0
+        with:
+       #   token: ${{ secrets.GITHUB_TOKEN }}
+          docker_name: 'ghcr.io/zaproxy/zaproxy:stable'
+          target: 'http://${{ needs.iac-build-and-deploy.outputs.target_url }}:3000'
+          rules_file_name: '.zap/rules.tsv'
+          cmd_options: '-a'
+      - name: Upload ZAP Scan Report
+        uses: actions/upload-artifact@v2
+        with:
+          name: zap-report
+          path: |
+            report_html.html
+            report_json.json
+>>>>>>> 58b162c831faea0bb5abeb45fde6f76fbbcac35f
