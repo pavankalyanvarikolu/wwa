@@ -30,7 +30,10 @@ jobs:
         run: |
           npm install
 <<<<<<< HEAD
+<<<<<<< HEAD
       #    npm test
+=======
+>>>>>>> 58b162c831faea0bb5abeb45fde6f76fbbcac35f
 =======
 >>>>>>> 58b162c831faea0bb5abeb45fde6f76fbbcac35f
 
@@ -103,6 +106,7 @@ jobs:
         working-directory: ./terraform
         run: |
 <<<<<<< HEAD
+<<<<<<< HEAD
          terraform init
          terraform validate -no-color
          terraform plan 
@@ -118,6 +122,8 @@ jobs:
     
          
 =======
+=======
+>>>>>>> 58b162c831faea0bb5abeb45fde6f76fbbcac35f
           terraform init
           terraform validate -no-color
           terraform plan 
@@ -155,4 +161,7 @@ jobs:
           path: |
             report_html.html
             report_json.json
+<<<<<<< HEAD
+>>>>>>> 58b162c831faea0bb5abeb45fde6f76fbbcac35f
+=======
 >>>>>>> 58b162c831faea0bb5abeb45fde6f76fbbcac35f
