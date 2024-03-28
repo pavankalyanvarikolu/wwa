@@ -97,16 +97,16 @@ jobs:
         working-directory: ./terraform
         run: |
          terraform init
-          terraform validate -no-color
-          terraform plan 
-          terraform apply -auto-approve | tee terraform_output.txt 
-          TARGET_URL=$(terraform output -json ec2_public_ip | jq -r '.value')
-          echo "::set-output name=target::$TARGET_URL"
-          echo "EC2 IP Address: $TARGET_URL"  # Print EC2 IP in the pipeline
-          echo "##[group]Terraform Output"
-          cat terraform_output.txt
-          echo "##[endgroup]"
-          terraform destroy -auto-approve  # Destroy resources after printing IP
+         terraform validate -no-color
+         terraform plan 
+         terraform apply -auto-approve | tee terraform_output.txt 
+         TARGET_URL=$(terraform output -json ec2_public_ip | jq -r '.value')
+         echo "::set-output name=target::$TARGET_URL"
+         echo "EC2 IP Address: $TARGET_URL"  # Print EC2 IP in the pipeline
+         echo "##[group]Terraform Output"
+         cat terraform_output.txt
+         echo "##[endgroup]"
+         terraform destroy -auto-approve  # Destroy resources after printing IP
 
   
  
