@@ -47,7 +47,7 @@ sudo systemctl start node_exporter
 sudo systemctl status node_exporter
 
 # Clone the repository containing Kubernetes files
-sudo git clone hhttps://github.com/pavankalyanvarikolu/wwa.git /home/ubuntu/wwa
+sudo git clone https://github.com/pavankalyanvarikolu/wwa.git /home/ubuntu/wwa
 
 # Navigate to the cloned repository directory
 cd /home/ubuntu/wwa
