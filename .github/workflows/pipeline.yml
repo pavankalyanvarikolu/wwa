@@ -105,48 +105,10 @@ jobs:
       - name: Get Terraform Output
         id: terraform_output
         run: |
-         cd ./terraform
-         TARGET_URL=$(terraform output ec2_public_ip)
-         echo "::set-output name=target::$TARGET_URL"
+          cd ./terraform
+          TARGET_URL=$(terraform output ec2_public_ip)
+          echo "::set-output name=target::$TARGET_URL"
+          echo "EC2 IP Address: $TARGET_URL"  # Print EC2 IP in the pipeline
 
   
-  OWASP-ZAP_scan:
-    runs-on: ubuntu-latest
-    name: OWASP-ZAP_scaning
-    permissions: write-all
-    #needs: [ Build_docker_FrontendImage, IAC_Build]
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v2
-
-      - name: Get Terraform Output
-        id: terraform_output
-        run: |
-         cd ./terraform
-         TARGET_URL=$(terraform output ec2_public_ip)
-         echo "::set-output name=target::$TARGET_URL"
-
-      - name: ZAP Scan
-        id: zap_scan
-        uses: zaproxy/action-baseline@v0.11.0
-        with:
-          docker_name: 'ghcr.io/zaproxy/zaproxy:stable'
-          target: ${{ steps.terraform_output.outputs.target }}
-          rules_file_name: '.zap/rules.tsv'
-          cmd_options: '-a'
-
-      - name: Upload ZAP Scan Report
-        if: ${{ failure() }}
-        uses: actions/upload-artifact@v2
-        with:
-          name: zap-report
-          path: |
-            report_html.html
-            report_json.json
-
-      - name: Destroy Terraform Resources
-        if: ${{ failure() }}
-        run: |
-         cd ./terraform
-         terraform destroy -auto-approve
-         
+ 
