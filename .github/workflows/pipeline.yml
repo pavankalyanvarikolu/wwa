@@ -101,10 +101,10 @@ jobs:
         working-directory: terraform
           
       - name: Terraform Plan
-        run: terraform plan --var-file=dev.terraform.tfvars
+        run: terraform plan --var-file=terraform.tfvars
         working-directory: terraform
       - name: Terraform Apply
-        run: terraform apply --auto-approve --var-file=dev.terraform.tfvars
+        run: terraform apply --auto-approve --var-file=terraform.tfvars
         working-directory: terraform-infra
           
     
@@ -122,10 +122,10 @@ jobs:
             wget -q $(wget -qO- https://api.github.com/repos/aquasecurity/tfsec/releases/latest | grep -o -E "https://[^\"]*linux_amd64.tar.gz") -O tfsec.tar.gz
             tar -xzf tfsec.tar.gz
             sudo install tfsec /usr/local/bin/
-          working-directory: terraform-infra
+          working-directory: terraform
     
         - name: Run tfsec
-          run: tfsec . --exclude-downloaded-modules --tfvars-file dev.terraform.tfvars
+          run: tfsec . --exclude-downloaded-modules --tfvars-file terraform.tfvars
           working-directory: terraform-infra
           continue-on-error: true
     
@@ -140,7 +140,7 @@ jobs:
         - name: Run Checkov IAC Scan
           run: |
             checkov -d . --framework terraform --download-external-modules true
-          working-directory: terraform-infra 
+          working-directory: terraform
           continue-on-error: true
           
     
