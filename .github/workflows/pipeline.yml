@@ -104,7 +104,7 @@ jobs:
         run: terraform plan --var-file=terraform.tfvars
         working-directory: terraform
       - name: Terraform Apply
-        run: terraform apply --auto-approve --var-file=terraform.tfvars
+        run: terraform apply --auto-approve
         working-directory: terraform-infra
           
     
