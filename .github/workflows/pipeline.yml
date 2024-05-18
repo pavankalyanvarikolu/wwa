@@ -105,7 +105,7 @@ jobs:
         working-directory: terraform
       - name: Terraform Apply
         run: terraform apply --auto-approve
-        working-directory: terraform-infra
+        working-directory: terraform
           
     
   infrastructure-audit:
@@ -126,7 +126,7 @@ jobs:
     
         - name: Run tfsec
           run: tfsec . --exclude-downloaded-modules --tfvars-file terraform.tfvars
-          working-directory: terraform-infra
+          working-directory: terraform
           continue-on-error: true
     
         - name: Install Checkov
